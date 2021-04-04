@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -74,10 +76,15 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun enableLocation() {
         if (isLocationPermissionGranted()) {
             map?.isMyLocationEnabled = true
+            zoomToCurrentLocation()
         }
         else {
             requestLocationPermission()
         }
+    }
+
+    private fun zoomToCurrentLocation() {
+        // TODO
     }
 
     private fun isLocationPermissionGranted() : Boolean {
