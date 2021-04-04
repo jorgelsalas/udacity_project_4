@@ -22,7 +22,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
-    private lateinit var map : GoogleMap
+    private var map : GoogleMap? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding =
@@ -35,7 +35,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setDisplayHomeAsUpEnabled(true)
 
 //      TODO: add the map setup implementation
-        requestMap()
+        //requestMap()
 //        TODO: zoom to the user location after taking his permission
 //        TODO: add style to the map
 //        TODO: put a marker to location that the user selected
@@ -65,25 +65,25 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.normal_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_NORMAL
+            map?.mapType = GoogleMap.MAP_TYPE_NORMAL
             true
         }
         R.id.hybrid_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_HYBRID
+            map?.mapType = GoogleMap.MAP_TYPE_HYBRID
             true
         }
         R.id.satellite_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            map?.mapType = GoogleMap.MAP_TYPE_SATELLITE
             true
         }
         R.id.terrain_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_TERRAIN
+            map?.mapType = GoogleMap.MAP_TYPE_TERRAIN
             true
         }
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onMapReady(map: GoogleMap) {
+    override fun onMapReady(map: GoogleMap?) {
         this.map = map
     }
 
