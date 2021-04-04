@@ -22,7 +22,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_RED
+import com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.MarkerOptions
 import com.udacity.project4.R
 import com.udacity.project4.R.id.*
 import com.udacity.project4.R.raw.map_style
@@ -32,6 +37,7 @@ import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+import java.util.*
 
 private const val REQUEST_LOCATION_PERMISSION = 1
 
@@ -74,6 +80,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         this.map = map
 
         setMapStyle()
+        setMapLongClick(map!!)
         enableLocation()
     }
 
@@ -89,6 +96,25 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         catch (e: Resources.NotFoundException) {
             Log.e(TAG, "Can't find style. Error: ", e)
         }
+    }
+
+    private fun setMapLongClick(map: GoogleMap) {
+        map.setOnMapLongClickListener { latLng ->
+            map.addMarker(getMarkerOptions(latLng))
+        }
+    }
+
+    private fun getMarkerOptions(latLng: LatLng) : MarkerOptions {
+        return MarkerOptions()
+                .position(latLng)
+                .title(getString(R.string.dropped_pin))
+                .snippet(getSnippet(latLng))
+                .icon(defaultMarker(HUE_RED))
+    }
+
+    private fun getSnippet(latLng: LatLng) : String {
+        return String.format(Locale.getDefault(), "Lat: %1$.5f, Long: %2$.5f",
+                latLng.latitude, latLng.longitude)
     }
 
     @SuppressLint("MissingPermission")
