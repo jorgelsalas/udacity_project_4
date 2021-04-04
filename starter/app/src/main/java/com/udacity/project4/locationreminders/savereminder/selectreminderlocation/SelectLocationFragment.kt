@@ -4,13 +4,15 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.annotation.IdRes
 import androidx.databinding.DataBindingUtil
-import com.google.android.gms.location.*
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
 import com.udacity.project4.R
+import com.udacity.project4.R.id.*
+import com.udacity.project4.R.string.unable_to_change_map_type
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
@@ -35,7 +37,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setDisplayHomeAsUpEnabled(true)
 
 //      TODO: add the map setup implementation
-        //requestMap()
+        requestMap()
 //        TODO: zoom to the user location after taking his permission
 //        TODO: add style to the map
 //        TODO: put a marker to location that the user selected
@@ -63,24 +65,33 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         inflater.inflate(R.menu.map_options, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.normal_map -> {
-            map?.mapType = GoogleMap.MAP_TYPE_NORMAL
-            true
+    override fun onOptionsItemSelected(item: MenuItem) : Boolean {
+        return when (item.itemId) {
+            normal_map, hybrid_map, satellite_map, terrain_map -> {
+                updateMapType(item.itemId)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        R.id.hybrid_map -> {
-            map?.mapType = GoogleMap.MAP_TYPE_HYBRID
-            true
+    }
+
+    private fun updateMapType(itemId: Int) {
+        if (map != null) {
+            map?.mapType = getMapType(itemId)
         }
-        R.id.satellite_map -> {
-            map?.mapType = GoogleMap.MAP_TYPE_SATELLITE
-            true
+        else {
+            Toast.makeText(context, getString(unable_to_change_map_type), Toast.LENGTH_SHORT).show()
         }
-        R.id.terrain_map -> {
-            map?.mapType = GoogleMap.MAP_TYPE_TERRAIN
-            true
+    }
+
+    private fun getMapType(@IdRes menuOption: Int) : Int {
+        return when(menuOption) {
+            normal_map -> MAP_TYPE_NORMAL
+            hybrid_map -> MAP_TYPE_HYBRID
+            satellite_map -> MAP_TYPE_SATELLITE
+            terrain_map -> MAP_TYPE_TERRAIN
+            else -> MAP_TYPE_NORMAL
         }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onMapReady(map: GoogleMap?) {
