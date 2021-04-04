@@ -6,7 +6,9 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.IdRes
@@ -20,8 +22,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.udacity.project4.R
 import com.udacity.project4.R.id.*
+import com.udacity.project4.R.raw.map_style
 import com.udacity.project4.R.string.unable_to_change_map_type
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -51,7 +55,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 //      TODO: add the map setup implementation
         requestMap()
 //        TODO: zoom to the user location after taking his permission
-//        TODO: add style to the map
+
 //        TODO: put a marker to location that the user selected
 
 
@@ -69,7 +73,22 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap?) {
         this.map = map
 
+        setMapStyle()
         enableLocation()
+    }
+
+    private fun setMapStyle() {
+        try {
+            val mapStyle = MapStyleOptions.loadRawResourceStyle(context, map_style)
+            val success = map?.setMapStyle(mapStyle) ?: false
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.")
+            }
+        }
+        catch (e: Resources.NotFoundException) {
+            Log.e(TAG, "Can't find style. Error: ", e)
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -143,4 +162,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
+    companion object {
+        private val TAG = SelectLocationFragment::class.java.simpleName
+    }
 }
