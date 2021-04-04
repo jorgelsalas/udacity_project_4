@@ -1,10 +1,18 @@
 package com.udacity.project4.locationreminders.savereminder.selectreminderlocation
 
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.IdRes
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
@@ -18,6 +26,8 @@ import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+
+private const val REQUEST_LOCATION_PERMISSION = 1
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
@@ -52,6 +62,38 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun requestMap() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    override fun onMapReady(map: GoogleMap?) {
+        this.map = map
+
+        enableLocation()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun enableLocation() {
+        if (isLocationPermissionGranted()) {
+            map?.isMyLocationEnabled = true
+        }
+        else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun isLocationPermissionGranted() : Boolean {
+        return checkSelfPermission(context!!, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
+    }
+
+    private fun requestLocationPermission() {
+        requestPermissions(arrayOf(ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
+                enableLocation()
+            }
+        }
     }
 
     private fun onLocationSelected() {
@@ -92,10 +134,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             terrain_map -> MAP_TYPE_TERRAIN
             else -> MAP_TYPE_NORMAL
         }
-    }
-
-    override fun onMapReady(map: GoogleMap?) {
-        this.map = map
     }
 
 }
