@@ -41,6 +41,7 @@ class RemindersActivity : AppCompatActivity() {
         // TODO: Why does finding by id not work?
         //val fr = nav_host_fragment.childFragmentManager.findFragmentById(R.id.selectLocationFragment)
 
-        nav_host_fragment.childFragmentManager.fragments[0]?.onActivityResult(requestCode, resultCode, data)
+        //nav_host_fragment.childFragmentManager.fragments[0]?.onActivityResult(requestCode, resultCode, data)
+        nav_host_fragment.childFragmentManager.primaryNavigationFragment?.onActivityResult(requestCode, resultCode, data)
     }
 }
