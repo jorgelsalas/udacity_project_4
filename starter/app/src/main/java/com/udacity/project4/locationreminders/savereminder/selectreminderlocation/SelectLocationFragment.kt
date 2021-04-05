@@ -5,6 +5,8 @@ import android.Manifest
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
 import android.os.Build
@@ -14,10 +16,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -27,19 +35,25 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory.defaultMarker
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE
 import com.udacity.project4.R
 import com.udacity.project4.R.id.*
 import com.udacity.project4.R.raw.map_style
+import com.udacity.project4.R.string.location_required_error
 import com.udacity.project4.R.string.unable_to_change_map_type
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+import java.lang.Exception
 import java.util.*
 
 private const val REQUEST_LOCATION_PERMISSION = 1
 private const val REQUEST_BACKGROUND_LOCATION_PERMISSION = 2
+private const val REQUEST_TURN_DEVICE_LOCATION_ON = 3
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
@@ -124,6 +138,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             if (runningQOrLater) {
                 enableBackgroundLocation()
             }
+            else {
+                // TODO:
+            }
         }
         else {
             requestLocationPermission()
@@ -133,10 +150,76 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     @RequiresApi(Q)
     private fun enableBackgroundLocation() {
         if (isBackgroundLocationPermissionGranted()) {
-            Toast.makeText(context, "BG Loc enabled!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "BG Loc enabled!", LENGTH_SHORT).show()
+            verifyUserHasLocationEnabled()
         }
         else {
             requestBackgroundLocationPermission()
+        }
+    }
+
+    private fun verifyUserHasLocationEnabled(resolve:Boolean = true) {
+
+        val locationSettingsResponseTask = getLocationSettingsResponseTask()
+
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            onLocationSettingsResponseError(exception, resolve)
+        }
+
+        locationSettingsResponseTask.addOnCompleteListener(this::onLocationSettingsResponseSuccess)
+    }
+
+    private fun getLocationSettingsResponseTask() : Task<LocationSettingsResponse> {
+        val builder = LocationSettingsRequest.Builder()
+                .addLocationRequest(getLocationRequest())
+
+        val settingsClient = LocationServices.getSettingsClient(activity!!)
+        return settingsClient.checkLocationSettings(builder.build())
+    }
+
+    private fun getLocationRequest() : LocationRequest {
+        return LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+    }
+
+    private fun onLocationSettingsResponseError(exception: Exception, resolve:Boolean = true) {
+        if (exception is ResolvableApiException && resolve){
+            try {
+                toast("Trying to resolve!")
+                exception.startResolutionForResult(activity, REQUEST_TURN_DEVICE_LOCATION_ON)
+            }
+            catch (sendEx: IntentSender.SendIntentException) {
+                toast("Exception while trying to resolve")
+                Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
+            }
+        }
+        else {
+            Snackbar.make(binding.root, location_required_error, LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok) {
+                        toast("Snackback action!!!")
+                        verifyUserHasLocationEnabled()
+                    }
+                    .show()
+        }
+    }
+
+    private fun onLocationSettingsResponseSuccess(task : Task<LocationSettingsResponse>) {
+        if ( task.isSuccessful ) {
+            toast("Location is on!")
+            zoomToCurrentLocation()
+        }
+        else {
+            toast("task failed")
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        toast("onActivityResult")
+        if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
+            toast("Request matches! Retrying user location verification!")
+            verifyUserHasLocationEnabled(false)
         }
     }
 
@@ -174,8 +257,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 enableLocation()
             }
         }
-        else if (requestCode == REQUEST_LOCATION_PERMISSION) {
-
+        else if (requestCode == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
+                enableBackgroundLocation()
+            }
         }
     }
 
@@ -205,7 +290,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             map?.mapType = getMapType(itemId)
         }
         else {
-            Toast.makeText(context, getString(unable_to_change_map_type), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(unable_to_change_map_type), LENGTH_SHORT).show()
         }
     }
 
@@ -221,5 +306,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     companion object {
         private val TAG = SelectLocationFragment::class.java.simpleName
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(activity, message, LENGTH_SHORT).show()
     }
 }

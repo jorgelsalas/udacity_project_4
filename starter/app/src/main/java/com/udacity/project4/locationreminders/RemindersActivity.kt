@@ -1,12 +1,15 @@
 package com.udacity.project4.locationreminders
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.udacity.project4.R
 import kotlinx.android.synthetic.main.activity_reminders.*
@@ -30,5 +33,14 @@ class RemindersActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // TODO: Why does finding by id not work?
+        //val fr = nav_host_fragment.childFragmentManager.findFragmentById(R.id.selectLocationFragment)
+
+        nav_host_fragment.childFragmentManager.fragments[0]?.onActivityResult(requestCode, resultCode, data)
     }
 }
