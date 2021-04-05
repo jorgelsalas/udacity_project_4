@@ -1,15 +1,21 @@
 package com.udacity.project4.locationreminders.savereminder.selectreminderlocation
 
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
+import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.IdRes
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.maps.GoogleMap
@@ -33,6 +39,7 @@ import org.koin.android.ext.android.inject
 import java.util.*
 
 private const val REQUEST_LOCATION_PERMISSION = 1
+private const val REQUEST_BACKGROUND_LOCATION_PERMISSION = 2
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
@@ -40,6 +47,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private var map : GoogleMap? = null
+    private val runningQOrLater = SDK_INT >= Q
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding =
@@ -66,6 +74,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    @SuppressLint("NewApi")
     override fun onMapReady(map: GoogleMap?) {
         this.map = map
 
@@ -107,14 +116,27 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 latLng.latitude, latLng.longitude)
     }
 
+    @RequiresApi(Q)
     @SuppressLint("MissingPermission")
     private fun enableLocation() {
         if (isLocationPermissionGranted()) {
             map?.isMyLocationEnabled = true
-            zoomToCurrentLocation()
+            if (runningQOrLater) {
+                enableBackgroundLocation()
+            }
         }
         else {
             requestLocationPermission()
+        }
+    }
+
+    @RequiresApi(Q)
+    private fun enableBackgroundLocation() {
+        if (isBackgroundLocationPermissionGranted()) {
+            Toast.makeText(context, "BG Loc enabled!", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            requestBackgroundLocationPermission()
         }
     }
 
@@ -126,15 +148,34 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         return checkSelfPermission(context!!, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
     }
 
+    @RequiresApi(Q)
+    private fun isBackgroundLocationPermissionGranted() : Boolean {
+        return if (runningQOrLater) {
+            PERMISSION_GRANTED == checkSelfPermission(context!!, ACCESS_BACKGROUND_LOCATION)
+        }
+        else {
+            true
+        }
+    }
+
     private fun requestLocationPermission() {
         requestPermissions(arrayOf(ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
     }
 
+    @RequiresApi(Q)
+    private fun requestBackgroundLocationPermission() {
+        requestPermissions(arrayOf(ACCESS_BACKGROUND_LOCATION), REQUEST_BACKGROUND_LOCATION_PERMISSION)
+    }
+
+    @RequiresApi(Q)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
                 enableLocation()
             }
+        }
+        else if (requestCode == REQUEST_LOCATION_PERMISSION) {
+
         }
     }
 
