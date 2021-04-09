@@ -3,6 +3,8 @@ package com.udacity.project4.base
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import com.udacity.project4.authentication.FirebaseUserLiveData
 import com.udacity.project4.utils.SingleLiveEvent
 
 /**
@@ -18,4 +20,15 @@ abstract class BaseViewModel(app: Application) : AndroidViewModel(app) {
     val showLoading: SingleLiveEvent<Boolean> = SingleLiveEvent()
     val showNoData: MutableLiveData<Boolean> = MutableLiveData()
 
+    enum class AuthenticationState {
+        AUTHENTICATED, UNAUTHENTICATED, INVALID_AUTHENTICATION
+    }
+
+    val authenticationState = FirebaseUserLiveData().map { user ->
+        if (user != null) {
+            AuthenticationState.AUTHENTICATED
+        } else {
+            AuthenticationState.UNAUTHENTICATED
+        }
+    }
 }
