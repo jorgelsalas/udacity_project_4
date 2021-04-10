@@ -19,6 +19,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -43,6 +44,7 @@ import com.udacity.project4.R.raw.map_style
 import com.udacity.project4.R.string.location_required_error
 import com.udacity.project4.R.string.unable_to_change_map_type
 import com.udacity.project4.base.BaseFragment
+import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
@@ -270,6 +272,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //        TODO: When the user confirms on the selected location,
         //         send back the selected location details to the view model
         //         and navigate back to the previous fragment to save the reminder and add the geofence
+        _viewModel.latitude.value = lastMarker?.position?.latitude
+        _viewModel.longitude.value = lastMarker?.position?.longitude
+        _viewModel.reminderSelectedLocationStr.value = lastMarker?.title
+
+        // TODO: Figure out why the nav command does not work
+        //NavigationCommand.Back
+        findNavController().popBackStack()
     }
 
 
