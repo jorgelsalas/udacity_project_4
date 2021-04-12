@@ -97,6 +97,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         setMapStyle()
         setMapLongClick(map!!)
+        setPoiClick(map)
         enableLocation()
     }
 
@@ -132,6 +133,22 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun getSnippet(latLng: LatLng) : String {
         return String.format(Locale.getDefault(), "Lat: %1$.5f, Long: %2$.5f",
                 latLng.latitude, latLng.longitude)
+    }
+
+    private fun setPoiClick(map: GoogleMap) {
+        map.setOnPoiClickListener { poi ->
+            lastMarker?.let { map.clear() }
+
+            val poiMarker = map.addMarker(
+                    MarkerOptions()
+                            .position(poi.latLng)
+                            .title(poi.name)
+            )
+            poiMarker.showInfoWindow()
+
+
+            lastMarker = poiMarker
+        }
     }
 
     @RequiresApi(Q)
