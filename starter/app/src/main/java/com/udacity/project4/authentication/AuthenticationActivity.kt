@@ -59,7 +59,7 @@ class AuthenticationActivity : AppCompatActivity() {
     private fun onAuthenticationStateChange(authenticationState: BaseViewModel.AuthenticationState) {
         when (authenticationState) {
             AUTHENTICATED -> startActivity(Intent(this, RemindersActivity::class.java))
-            UNAUTHENTICATED -> { Log.i(TAG, "Authenticated") }
+            UNAUTHENTICATED -> { Log.i(TAG, "Unauthenticated") }
             else -> Log.e(TAG, "Unexpected AuthenticationState: $authenticationState")
         }
     }
