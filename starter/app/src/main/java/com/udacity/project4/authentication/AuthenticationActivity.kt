@@ -4,16 +4,21 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder
 import com.firebase.ui.auth.AuthUI.IdpConfig.GoogleBuilder
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.udacity.project4.R
+import com.udacity.project4.base.BaseViewModel
+import com.udacity.project4.base.BaseViewModel.AuthenticationState.AUTHENTICATED
+import com.udacity.project4.base.BaseViewModel.AuthenticationState.UNAUTHENTICATED
 import com.udacity.project4.databinding.ActivityAuthenticationBinding
+import com.udacity.project4.locationreminders.RemindersActivity
 
 /**
  * This class should be the starting point of the app, It asks the users to sign in / register, and redirects the
@@ -27,13 +32,20 @@ private val TAG = AuthenticationActivity::class.java.simpleName
 class AuthenticationActivity : AppCompatActivity() {
 
     lateinit var binding : ActivityAuthenticationBinding
+    lateinit var viewModel : AuthenticationActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_authentication)
 
+        viewModel = ViewModelProvider(this).get(AuthenticationActivityViewModel::class.java)
+
         binding.loginButton.setOnClickListener { launchSignInFlow() }
+
+        viewModel.authenticationState.observe(this, Observer {
+            onAuthenticationStateChange(it)
+        })
 //         TODO: Implement the create account and sign in using FirebaseUI, use sign in using email and sign in using Google
 
 //          TODO: If the user was authenticated, send him to RemindersActivity
@@ -41,6 +53,15 @@ class AuthenticationActivity : AppCompatActivity() {
 //          TODO: a bonus is to customize the sign in flow to look nice using :
         //https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md#custom-layout
 
+        // TODO: Figure out why google account sign in did not work, but email and password did
+    }
+
+    private fun onAuthenticationStateChange(authenticationState: BaseViewModel.AuthenticationState) {
+        when (authenticationState) {
+            AUTHENTICATED -> startActivity(Intent(this, RemindersActivity::class.java))
+            UNAUTHENTICATED -> { Log.i(TAG, "Authenticated") }
+            else -> Log.e(TAG, "Unexpected AuthenticationState: $authenticationState")
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
