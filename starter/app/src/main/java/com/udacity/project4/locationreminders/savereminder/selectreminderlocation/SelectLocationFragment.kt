@@ -312,9 +312,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, OnSuccessList
             _viewModel.longitude.value = lastMarker?.position?.longitude
             _viewModel.reminderSelectedLocationStr.value = lastMarker?.title
 
-            // TODO: Figure out why the nav command does not work
-            //NavigationCommand.Back
-            findNavController().popBackStack()
+            _viewModel.navigationCommand.value = NavigationCommand.Back
         }
         else {
             toast(getString(R.string.unavailable_marker_error))
