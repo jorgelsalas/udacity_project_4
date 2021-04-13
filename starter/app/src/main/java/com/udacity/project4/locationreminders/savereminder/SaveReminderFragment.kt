@@ -3,14 +3,12 @@ package com.udacity.project4.locationreminders.savereminder
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
@@ -81,7 +79,7 @@ class SaveReminderFragment : BaseFragment() {
 //            TODO: use the user entered reminder details to:
 //             1) add a geofencing request
 //             2) save the reminder to the local db
-                addGeofence()
+                addGeofence(reminderDataItem.id)
                 _viewModel.validateAndSaveReminder(reminderDataItem)
             }
         }
@@ -95,9 +93,9 @@ class SaveReminderFragment : BaseFragment() {
 
 
     @SuppressLint("MissingPermission")
-    private fun addGeofence() {
+    private fun addGeofence(id: String) {
         val geofence = Geofence.Builder()
-            .setRequestId(UUID.randomUUID().toString())
+            .setRequestId(id)
             .setCircularRegion(_viewModel.latitude.value!!,
                 _viewModel.longitude.value!!,
                 100f
@@ -118,7 +116,7 @@ class SaveReminderFragment : BaseFragment() {
                 Toast.makeText(context, R.string.geofences_added,
                     Toast.LENGTH_SHORT)
                     .show()
-                Log.e("Added Geofence", geofence.requestId)
+                Log.i("Added Geofence", geofence.requestId)
             }
             addOnFailureListener {
                 Toast.makeText(context, R.string.geofences_not_added,
