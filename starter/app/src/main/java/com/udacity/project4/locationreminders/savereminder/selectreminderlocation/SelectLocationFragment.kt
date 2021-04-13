@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
+import android.location.Location
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
 import android.os.Bundle
@@ -21,10 +22,8 @@ import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -35,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE
@@ -55,7 +55,7 @@ private const val REQUEST_LOCATION_PERMISSION = 1
 private const val REQUEST_BACKGROUND_LOCATION_PERMISSION = 2
 private const val REQUEST_TURN_DEVICE_LOCATION_ON = 3
 
-class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
+class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, OnSuccessListener<Location> {
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
@@ -64,6 +64,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private val runningQOrLater = SDK_INT >= Q
 
     private var lastMarker: Marker? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding =
@@ -82,6 +83,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 //        TODO: call this function after the user confirms on the selected location
         binding.saveButton.setOnClickListener { onLocationSelected() }
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         return binding.root
     }
@@ -160,7 +162,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 enableBackgroundLocation()
             }
             else {
-                // TODO:
+                verifyUserHasLocationEnabled()
             }
         }
         else {
@@ -228,11 +230,31 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun onLocationSettingsResponseSuccess(task : Task<LocationSettingsResponse>) {
         if ( task.isSuccessful ) {
             toast("Location is on!")
-            zoomToCurrentLocation()
+            getLastKnownLocation()
         }
         else {
             toast("task failed")
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLastKnownLocation() {
+        fusedLocationClient.lastLocation.addOnSuccessListener(requireActivity(), this)
+    }
+
+    override fun onSuccess(location: Location?) {
+        if (location != null && map != null) {
+            zoomToCurrentLocation(location)
+        }
+        else {
+            toast("Unable to acquire last known location")
+        }
+    }
+
+    private fun zoomToCurrentLocation(location: Location) {
+        val currentLatLng = LatLng(location.latitude, location.longitude)
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 16f)
+        map!!.moveCamera(cameraUpdate)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -242,10 +264,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             toast("Request matches! Retrying user location verification!")
             verifyUserHasLocationEnabled(false)
         }
-    }
-
-    private fun zoomToCurrentLocation() {
-        // TODO
     }
 
     private fun isLocationPermissionGranted() : Boolean {
@@ -289,13 +307,18 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //        TODO: When the user confirms on the selected location,
         //         send back the selected location details to the view model
         //         and navigate back to the previous fragment to save the reminder and add the geofence
-        _viewModel.latitude.value = lastMarker?.position?.latitude
-        _viewModel.longitude.value = lastMarker?.position?.longitude
-        _viewModel.reminderSelectedLocationStr.value = lastMarker?.title
+        if (lastMarker != null)  {
+            _viewModel.latitude.value = lastMarker?.position?.latitude
+            _viewModel.longitude.value = lastMarker?.position?.longitude
+            _viewModel.reminderSelectedLocationStr.value = lastMarker?.title
 
-        // TODO: Figure out why the nav command does not work
-        //NavigationCommand.Back
-        findNavController().popBackStack()
+            // TODO: Figure out why the nav command does not work
+            //NavigationCommand.Back
+            findNavController().popBackStack()
+        }
+        else {
+            toast(getString(R.string.unavailable_marker_error))
+        }
     }
 
 

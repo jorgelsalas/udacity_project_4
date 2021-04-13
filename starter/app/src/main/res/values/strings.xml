@@ -51,4 +51,5 @@
     </string>
     <string name="save_button_label">Save</string>
     <string name="login_button_label">Login</string>
+    <string name="unavailable_marker_error">Please add a marker or select a POI</string>
 </resources>
