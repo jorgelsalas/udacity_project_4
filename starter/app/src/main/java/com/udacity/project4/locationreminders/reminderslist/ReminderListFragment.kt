@@ -58,7 +58,8 @@ class ReminderListFragment : BaseFragment() {
                 startActivity(intent)
             }
             else -> Log.e(TAG, "Unexpected AuthenticationState: $authenticationState")
-        }    }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
