@@ -59,14 +59,16 @@ class AuthenticationActivity : AppCompatActivity() {
 
     private fun onAuthenticationStateChange(authenticationState: BaseViewModel.AuthenticationState) {
         when (authenticationState) {
-            AUTHENTICATED -> {
-                val intent = Intent(this, RemindersActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-            }
-            UNAUTHENTICATED -> { Log.i(TAG, "Unauthenticated") }
+            AUTHENTICATED -> openRemindersActivity()
+            UNAUTHENTICATED -> Log.i(TAG, "Unauthenticated")
             else -> Log.e(TAG, "Unexpected AuthenticationState: $authenticationState")
         }
+    }
+
+    private fun openRemindersActivity() {
+        val intent = Intent(this, RemindersActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
