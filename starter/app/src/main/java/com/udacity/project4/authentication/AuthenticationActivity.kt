@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder
 import com.firebase.ui.auth.AuthUI.IdpConfig.GoogleBuilder
@@ -92,10 +93,19 @@ class AuthenticationActivity : AppCompatActivity() {
         return AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(getProviders())
+                .setAuthMethodPickerLayout(getAuthMethodPickerLayout())
                 .build()
     }
 
+
     private fun getProviders() : List<AuthUI.IdpConfig> {
         return arrayListOf(EmailBuilder().build(), GoogleBuilder().build())
+    }
+
+    private fun getAuthMethodPickerLayout(): AuthMethodPickerLayout {
+        return AuthMethodPickerLayout.Builder(R.layout.auth_method_picker_layout)
+                .setEmailButtonId(R.id.email_auth_button)
+                .setGoogleButtonId(R.id.google_auth_button)
+                .build()
     }
 }
