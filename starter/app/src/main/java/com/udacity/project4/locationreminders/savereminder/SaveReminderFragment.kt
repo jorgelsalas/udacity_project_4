@@ -1,6 +1,7 @@
 package com.udacity.project4.locationreminders.savereminder
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +15,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
+import com.udacity.project4.MyApp
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
@@ -113,14 +115,18 @@ class SaveReminderFragment : BaseFragment() {
 
         geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
             addOnSuccessListener {
-                Toast.makeText(context, R.string.geofences_added,
-                    Toast.LENGTH_SHORT)
-                    .show()
+                context?.let {
+                    Toast.makeText(context, R.string.geofences_added,
+                            Toast.LENGTH_SHORT)
+                            .show()
+                }
                 Log.i("Added Geofence", geofence.requestId)
             }
             addOnFailureListener {
-                Toast.makeText(context, R.string.geofences_not_added,
-                    Toast.LENGTH_SHORT).show()
+                context?.let {
+                    Toast.makeText(context, R.string.geofences_not_added,
+                            Toast.LENGTH_SHORT).show()
+                }
                 if ((it.message != null)) {
                     Log.w(TAG, it.message!!)
                 }
