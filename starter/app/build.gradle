@@ -32,6 +32,14 @@ android {
         returnDefaultValues = true
     }
 
+    sourceSets {
+        String sharedTestDir = 'src/test/java/com/udacity/project4/locationreminders/utils'
+
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
+
     //dataBinding {
     //    enabled = true
     //    enabledForTests = true
