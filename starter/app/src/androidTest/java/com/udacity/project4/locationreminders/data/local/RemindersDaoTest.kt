@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
+import com.udacity.project4.locationreminders.utils.DataProvider.Companion.getSampleReminderDTO
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -92,14 +93,6 @@ class RemindersDaoTest {
         val reminderListAfterDeletion = database.reminderDao().getReminders()
         assertThat(reminderListAfterDeletion, Matchers.notNullValue())
         assertThat(reminderListAfterDeletion.isEmpty(), `is`(true))
-    }
-
-    private fun getSampleReminderDTO() : ReminderDTO {
-        return ReminderDTO("title",
-                "description",
-                "location",
-                0.0,
-                0.0)
     }
 
     private suspend fun insertSampleReminders(reminderCount: Int) {
