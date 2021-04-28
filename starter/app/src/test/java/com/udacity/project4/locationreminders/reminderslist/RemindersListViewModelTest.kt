@@ -9,6 +9,8 @@ import com.udacity.project4.locationreminders.MainCoroutineRule
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.getOrAwaitValue
+import com.udacity.project4.locationreminders.utils.DataProvider
+import com.udacity.project4.locationreminders.utils.DataProvider.Companion.getSampleReminderDTO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.core.Is.*
@@ -142,11 +144,4 @@ class RemindersListViewModelTest {
         assertThat(remindersListViewModel.showSnackBar.getOrAwaitValue(), `is`("Test Exception"))
     }
 
-    private fun getSampleReminderDTO() : ReminderDTO {
-        return ReminderDTO("title",
-                "description",
-                "location",
-                0.0,
-                0.0)
-    }
 }

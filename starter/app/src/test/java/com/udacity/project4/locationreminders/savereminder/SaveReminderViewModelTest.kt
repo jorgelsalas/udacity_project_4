@@ -12,7 +12,7 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.locationreminders.MainCoroutineRule
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.getOrAwaitValue
-import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.locationreminders.utils.DataProvider.Companion.getSampleReminderData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.core.Is.`is`
 import org.junit.After
@@ -230,12 +230,4 @@ class SaveReminderViewModelTest {
                 && saveReminderViewModel.longitude.getOrAwaitValue() == null
     }
 
-
-    private fun getSampleReminderData() : ReminderDataItem {
-        return ReminderDataItem("title",
-                "description",
-                "location",
-                0.0,
-                0.0)
-    }
 }
