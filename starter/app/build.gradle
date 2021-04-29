@@ -34,9 +34,11 @@ android {
 
     sourceSets {
         String sharedTestDir = 'src/test/java/com/udacity/project4/locationreminders/utils'
+        String sharedTestDataDir = 'src/test/java/com/udacity/project4/locationreminders/data'
 
         androidTest {
             java.srcDir sharedTestDir
+            java.srcDir sharedTestDataDir
         }
     }
 
