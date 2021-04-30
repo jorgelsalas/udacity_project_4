@@ -9,8 +9,10 @@ import androidx.navigation.Navigation
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
@@ -20,14 +22,17 @@ import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.ReminderDataSource
+import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.savereminder.SaveReminderFragment
 import com.udacity.project4.locationreminders.savereminder.SaveReminderFragmentDirections
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.locationreminders.utils.DataProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.core.IsNot.not
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -40,16 +45,14 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.*
 
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 //UI Testing
 @MediumTest
 class ReminderListFragmentTest : KoinTest {
-
-//    TODO: test the displayed data on the UI.
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
@@ -71,14 +74,13 @@ class ReminderListFragmentTest : KoinTest {
                         get() as ReminderDataSource
                 )
             }
-            single { RemindersLocalRepository(get()) as ReminderDataSource }
-            single { LocalDB.createRemindersDao(appContext) }
+            single { FakeDataSource() as ReminderDataSource }
         }
         //declare a new koin module
         startKoin {
             modules(listOf(myModule))
         }
-        //Get our real repository
+
         repository = get()
 
         //clear the data to start fresh
@@ -101,6 +103,33 @@ class ReminderListFragmentTest : KoinTest {
 
         // Then the user is taken to the SaveReminderFragment
         verify(navController).navigate(ReminderListFragmentDirections.toSaveReminder())
+    }
+
+    @Test
+    fun theNoDataTextViewIsShownWhenNoRemindersHaveBeenSaved() {
+        // When the user is on the ReminderListFragment and no reminders have been saved
+        launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
+
+        // Then the "no data" TextView is shown
+        onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun whenAReminderHasBeenSavedItsDataIsDisplayed() = runBlockingTest {
+        // Given there is one reminder saved in the repository
+        val sampleReminder = DataProvider.getSampleReminderDTO()
+        repository.saveReminder(sampleReminder)
+
+        // When the user is on the ReminderListFragment
+        launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
+
+        // Then the "no data" TextView is not shown
+        onView(withId(R.id.noDataTextView)).check(matches(not(isDisplayed())))
+
+        // And the item reminder data displayed corresponds to the reminder saved in the repo
+        onView(withText(sampleReminder.title)).check(matches(isDisplayed()))
+        onView(withText(sampleReminder.description)).check(matches(isDisplayed()))
+        onView(withText(sampleReminder.location)).check(matches(isDisplayed()))
     }
 
 
