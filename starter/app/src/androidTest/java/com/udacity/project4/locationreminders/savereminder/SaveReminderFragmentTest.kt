@@ -91,16 +91,12 @@ class SaveReminderFragmentTest {
         verify(navController).navigate(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
     }
 
-    // TODO: Ask why this test is flaky
     @Test
     fun attemptingToSaveAReminderWithoutTitleDisplaysAnErrorMessage() {
         // Given the user is on the SaveReminderFragment
         val scenario = launchFragmentInContainer<SaveReminderFragment>(Bundle(), R.style.AppTheme)
         dataBindingIdlingResource.monitorFragment(scenario)
         onView(withId(R.id.saveReminder)).check(matches(isDisplayed()))
-
-        //onView(withId(R.id.reminderTitle)).perform(replaceText("Title"))
-        //onView(withId(R.id.reminderTitle)).perform(replaceText(""))
 
         // When the saveReminder button is clicked
         onView(withId(R.id.saveReminder)).perform(click())
