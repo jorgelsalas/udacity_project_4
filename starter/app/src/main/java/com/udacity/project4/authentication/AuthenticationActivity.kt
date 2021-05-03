@@ -48,7 +48,6 @@ class AuthenticationActivity : AppCompatActivity() {
             onAuthenticationStateChange(it)
         })
 
-        // TODO: Figure out why google account sign in did not work, but email and password did
     }
 
     private fun onAuthenticationStateChange(authenticationState: BaseViewModel.AuthenticationState) {

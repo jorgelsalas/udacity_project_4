@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "733833997490-onjjot6lc5cjoh67q8abfumrok1cnd0o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udacity.project4",
+            "certificate_hash": "01a44ae8e19cc7b16743dcd3b4879e620b1e3eb8"
+          }
+        },
+        {
+          "client_id": "733833997490-sfgc4cm6bbfvk8anrloq9um9n7ub3tk2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udacity.project4",
+            "certificate_hash": "06b5de32874f4d5b1987cb8a179cbbbd48106672"
+          }
+        },
+        {
           "client_id": "733833997490-tpjj16v6qd31bempsni6iaj3uhvccosc.apps.googleusercontent.com",
           "client_type": 3
         }
