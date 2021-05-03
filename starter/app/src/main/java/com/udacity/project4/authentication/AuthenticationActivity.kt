@@ -47,12 +47,6 @@ class AuthenticationActivity : AppCompatActivity() {
         viewModel.authenticationState.observe(this, Observer {
             onAuthenticationStateChange(it)
         })
-//         TODO: Implement the create account and sign in using FirebaseUI, use sign in using email and sign in using Google
-
-//          TODO: If the user was authenticated, send him to RemindersActivity
-
-//          TODO: a bonus is to customize the sign in flow to look nice using :
-        //https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md#custom-layout
 
         // TODO: Figure out why google account sign in did not work, but email and password did
     }
@@ -98,7 +92,6 @@ class AuthenticationActivity : AppCompatActivity() {
                 .setAuthMethodPickerLayout(getAuthMethodPickerLayout())
                 .build()
     }
-
 
     private fun getProviders() : List<AuthUI.IdpConfig> {
         return arrayListOf(EmailBuilder().build(), GoogleBuilder().build())

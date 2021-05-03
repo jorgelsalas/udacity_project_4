@@ -77,10 +77,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, OnSuccessList
         setDisplayHomeAsUpEnabled(true)
 
         requestMap()
-//        TODO: zoom to the user location after taking his permission
 
-
-//        TODO: call this function after the user confirms on the selected location
         binding.saveButton.setOnClickListener { onLocationSelected() }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
@@ -304,9 +301,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, OnSuccessList
     }
 
     private fun onLocationSelected() {
-        //        TODO: When the user confirms on the selected location,
-        //         send back the selected location details to the view model
-        //         and navigate back to the previous fragment to save the reminder and add the geofence
         if (lastMarker != null)  {
             _viewModel.latitude.value = lastMarker?.position?.latitude
             _viewModel.longitude.value = lastMarker?.position?.longitude
