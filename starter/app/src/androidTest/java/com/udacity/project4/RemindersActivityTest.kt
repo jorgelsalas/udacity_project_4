@@ -1,5 +1,9 @@
 package com.udacity.project4
 
+import android.Manifest
+import android.Manifest.permission
+import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Application
 import androidx.annotation.IdRes
 import androidx.test.core.app.ActivityScenario
@@ -10,6 +14,8 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.rule.GrantPermissionRule.grant
 import com.udacity.project4.R.id.*
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
@@ -23,6 +29,7 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsNot
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -43,6 +50,12 @@ class RemindersActivityTest :
 
     // An idling resource that waits for Data Binding to have no pending bindings.
     private val dataBindingIdlingResource = DataBindingIdlingResource()
+
+    @get:Rule
+    var fineLocationPermissionRule: GrantPermissionRule = grant(ACCESS_FINE_LOCATION)
+
+    @get:Rule
+    var backgroundLocationPermissionRule: GrantPermissionRule = grant(ACCESS_BACKGROUND_LOCATION)
 
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
