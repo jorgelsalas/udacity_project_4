@@ -131,23 +131,4 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
-    // TODO: Is geofence removal required here?
-//    @RequiresApi(Build.VERSION_CODES.Q)
-//    private fun removeGeofences() {
-//        // TODO: In the example they ran this in the onDestroy of the activity: does this make sense?
-//        if (!isBackgroundLocationPermissionGranted() && !isLocationPermissionGranted()) {
-//            return
-//        }
-//        geofencingClient.removeGeofences(geofencePendingIntent)?.run {
-//            addOnSuccessListener {
-//                Log.d(TAG, getString(R.string.geofences_removed))
-//                Toast.makeText(context, R.string.geofences_removed, Toast.LENGTH_SHORT)
-//                    .show()
-//            }
-//            addOnFailureListener {
-//                Log.d(TAG, getString(R.string.geofences_not_removed))
-//            }
-//        }
-//    }
-
 }
