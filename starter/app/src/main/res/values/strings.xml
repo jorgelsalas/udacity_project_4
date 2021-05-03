@@ -53,4 +53,10 @@
     <string name="login_button_label">Login</string>
     <string name="unavailable_marker_error">Please add a marker or select a POI</string>
     <string name="auth_screen_image_content_desc">A map</string>
+    <string name="reminder_details_header">Reminder Details</string>
+    <string name="reminder_details_title">Title: %s</string>
+    <string name="reminder_details_location">Location: %s</string>
+    <string name="reminder_details_description">Description: %s</string>
+    <string name="reminder_details_lat">Lat: %s</string>
+    <string name="reminder_details_long">Long: %s</string>
 </resources>
