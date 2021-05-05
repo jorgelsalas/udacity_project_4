@@ -59,4 +59,6 @@
     <string name="reminder_details_description">Description: %s</string>
     <string name="reminder_details_lat">Lat: %s</string>
     <string name="reminder_details_long">Long: %s</string>
+    <string name="location_permission_required_error">Location permission is required to trigger reminders!!</string>
+    <string name="background_location_permission_required_error">Background Location permission is required to trigger reminders!!</string>
 </resources>

@@ -292,10 +292,16 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback, OnSuccessList
             if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
                 enableLocation()
             }
+            else {
+                toast(getString(R.string.location_permission_required_error))
+            }
         }
         else if (requestCode == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
                 enableBackgroundLocation()
+            }
+            else {
+                toast(getString(R.string.background_location_permission_required_error))
             }
         }
     }
